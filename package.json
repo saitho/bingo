@@ -7,12 +7,12 @@
   "keywords": [
     "bingo"
   ],
-  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/saitho/bingo.git"
   },
   "scripts": {
+    "start": "http-server -p 80 dist",
     "dev:serve": "live-server dist",
     "build": "rm -rf dist && tsc && cp resources/* dist",
     "docs:build": "typedoc --out ./docs --mode modules --tsconfig ./tsconfig.json ./src/ && touch ./docs/.nojekyll",
@@ -37,5 +37,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "http-server": "^0.12.1"
   }
 }
