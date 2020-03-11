@@ -57,7 +57,7 @@ async function newBoard() {
             const col = bingo.querySelectorAll('.col')[i];
             for(let j = 0; j < settings.rows; j++) {
                 const content = col.querySelectorAll('.flip-card')[j];
-                await updateCellElement(content, data[pos++]);
+                await updateCellElement(content, data[pos++], true);
             }
             continue;
         }
@@ -72,9 +72,9 @@ async function newBoard() {
                 i === Math.floor(settings.cols / 2) &&
                 j === Math.floor(settings.rows / 2)
             ) {
-                content = createCellElement('FREE SPACE', true);
+                content = await createCellElement('FREE SPACE', true);
             } else {
-                content = createCellElement(data[pos++]);
+                content = await createCellElement(data[pos++]);
             }
             cellElements.push(content);
             col.appendChild(content);
@@ -87,7 +87,7 @@ async function newBoard() {
     boardInitialized = true;
 }
 
-function updateCellElement(flipCard: Element, text: string): Promise<void> {
+function updateCellElement(flipCard: Element, text: string, addRefreshBtn = false): Promise<void> {
     return new Promise<void>((resolve) => {
         const isFlipped = flipCard.classList.contains('flip');
         if (flipCard.classList.contains('flip-card--free')) {
@@ -99,11 +99,17 @@ function updateCellElement(flipCard: Element, text: string): Promise<void> {
         const backSelector = '.flip-card__content--back';
 
         // Set new content
-        // todo: refactor the next 3 lines into a .reset() method on FlipCard object
-        const contentArea = flipCard.querySelector(isFlipped ? frontSelector : backSelector);
-        contentArea.classList.remove('checked');
-        contentArea.classList.remove('flip-card__content--empty');
-        contentArea.querySelector('.text').innerHTML = text;
+        // todo: refactor the next 5 lines into a .reset() method on FlipCard object
+        const newContentArea = flipCard.querySelector(isFlipped ? frontSelector : backSelector);
+        newContentArea.classList.remove('checked');
+        newContentArea.classList.remove('flip-card__content--empty');
+        newContentArea.querySelector('.text').innerHTML = text;
+        if (addRefreshBtn) {
+            if (!newContentArea.querySelector('button.refresh-button')) {
+                newContentArea.innerHTML = `<button class="refresh-button"><i class="fa fa-refresh"></i></button>` + newContentArea.innerHTML;
+            }
+        }
+
         setTimeout(() => {
             if (isFlipped) {
                 flipCard.classList.remove('flip');
@@ -111,33 +117,35 @@ function updateCellElement(flipCard: Element, text: string): Promise<void> {
                 flipCard.classList.add('flip');
             }
             // Remove old content
-            // todo: refactor the next 3 lines into a .reset() method on FlipCard object
-            const contentArea = flipCard.querySelector(isFlipped ? backSelector : frontSelector);
-            contentArea.classList.remove('checked');
-            contentArea.querySelector('.text').innerHTML = '';
+            // todo: refactor the next 5 lines into a .reset() method on FlipCard object
+            const oldContentArea = flipCard.querySelector(isFlipped ? backSelector : frontSelector);
+            oldContentArea.classList.remove('checked');
+            oldContentArea.querySelector('.text').innerHTML = '';
+            if (addRefreshBtn) {
+                if (!oldContentArea.querySelector('button.refresh-button')) {
+                    oldContentArea.innerHTML = `<button class="refresh-button"><i class="fa fa-refresh"></i></button>` + oldContentArea.innerHTML;
+                }
+            }
             resolve();
         }, 100);
     });
 }
 
-function createCellElement(text: string, isFree = false) {
+async function createCellElement(text: string, isFree = false) {
     const flipCard = document.createElement('div');
     flipCard.classList.add('flip-card');
-    let refreshButton = `<button class="refresh-button"><i class="fa fa-refresh"></i></button>`;
     if (isFree) {
         flipCard.classList.add('flip-card--free');
-        refreshButton = '';
     }
     flipCard.innerHTML = `<div class="flip-card-inner">
          <div class="flip-card__content flip-card__content--front flip-card__content--empty">
-            ${refreshButton}
             <span class="text"></span>
          </div>
          <div class="flip-card__content flip-card__content--back">
-            ${refreshButton}
-            <span class="text">${text}</span>
+            <span class="text"></span>
          </div>
      </div>`;
+    await updateCellElement(flipCard, text, true);
     return flipCard;
 }
 
@@ -167,7 +175,7 @@ async function swapCard(e) {
     const flipCard = e.target.closest('.flip-card');
     await updateCellElement(flipCard, data[pos++]);
     if (pos >= data.length) { // No more cards in array -> remove swap buttons.
-        document.querySelector('.refresh-button').remove();
+        document.querySelectorAll('.refresh-button').forEach((e) => e.remove());
     }
     saveBoard();
 }
