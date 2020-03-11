@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css?family=Lato');
+@import url('./css/fontawesome.css');
+
+.actions {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.button {
+  display: inline-block;
+  position: relative;
+  border-radius: 2px;
+  padding: 10px 20px;
+  border: 0;
+  font-weight: bold;
+  font-size: 0.9em;
+  text-decoration: none;
+  text-align: center;
+}
+
+.button.disabled {
+  background-color: var(--button-disabled-bg-color);
+  filter: none !important;
+}
+.button.blue {
+  background-color: var(--button-bg-color);
+  color: white;
+}
+.button:hover {
+  filter: brightness(115%);
+}
+
+.refresh-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
+bingo-field {
+  background-color: transparent;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+
+  position: relative;
+  align-items: center;
+  color: black;
+  display: flex;
+  font-size: 11pt;
+  width: 150px;
+  height: 150px;
+  text-transform: uppercase;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  border: 2px solid black;
+  transform-style: preserve-3d;
+}
+
+bingo-field.flip .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card__content {
+  position: absolute;
+  background: white;
+  width: 100%;
+  height: 100%;
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+.flip-card__content .text {
+  padding: 5px;
+}
+
+bingo-field[checked] .flip-card__content, bingo-field[free] .flip-card__content {
+  background: var(--cell-active-bg-color);
+}
+
+bingo-field:not(.flip) .flip-card-inner--empty-front, bingo-field.flip .flip-card-inner--empty-back {
+  border: 0;
+}
+
+.flip-card-inner--empty-front .flip-card__content--front, .flip-card-inner--empty-back .flip-card__content--back {
+  display: none;
+}
+
+/* Style the back side */
+.flip-card__content--back {
+  transform: rotateY(180deg);
+}
+
+.field-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+@media print {
+  .button, .refresh-button {
+    display: none;
+  }
+  .flip-card__content {
+    border: 1px solid black;
+  }
+  bingo-field:not(.flip) .flip-card__content--back {
+    display: none;
+  }
+}
