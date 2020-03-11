@@ -1,12 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Lato');
+/*
 @font-face {
   font-family: 'Overwatch';
   src: url(https://us.battle.net/forums/static/fonts/f014015d/f014015d.woff);
 }
+*/
 
 :root {
   --main-bg-color: #405275;
   --button-bg-color: #218ffe;
+  --button-disabled-bg-color: #aaa;
   --cell-active-bg-color: #f99e1a;
 }
 
@@ -47,15 +50,85 @@ a {
   text-align: center;
 }
 
+/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+
+  position: relative;
+  align-items: center;
+  color: black;
+  display: flex;
+  font-size: 11pt;
+  width: 150px;
+  height: 150px;
+  text-transform: uppercase;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.flip-card.flip .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card__content {
+  position: absolute;
+  background: white;
+  width: 100%;
+  height: 100%;
+  border: 2px solid black;
+  padding: 5px;
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+.flip-card__content.checked, .flip-card--free .flip-card__content {
+  background: var(--cell-active-bg-color);
+}
+
+.flip-card__content--empty {
+  display: none;
+}
+
+/* Style the back side */
+.flip-card__content--back {
+  transform: rotateY(180deg);
+}
+
 .refresh-button {
   position: absolute;
   top: 5px;
   right: 5px;
 }
 
+.button.disabled {
+  background-color: var(--button-disabled-bg-color);
+  filter: none !important;
+}
 .button.blue {
   background-color: var(--button-bg-color);
   color: white;
+}
+.button:hover {
+  filter: brightness(115%);
 }
 
 h1 {
@@ -73,48 +146,17 @@ h1 {
   justify-content: center;
 }
 
-.col {
-  flex: 0;
-  transition: opacity 0.5s;
-  opacity: 1;
-}
-
-.cell {
-  position: relative;
-  align-items: center;
-  background: white;
-  border: 2px solid black;
-  color: black;
-  display: flex;
-  font-size: 11pt;
-  width: 150px;
-  height: 150px;
-  word-break: break-word;
-  justify-content: center;
-  padding: 5px;
-  text-align: center;
-  text-transform: uppercase;
-  user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-select: none;
-}
-
-.cell.checked, .cell.free {
-  background: var(--cell-active-bg-color);
-}
-
-#header .cell {
-  background-color: var(--button-bg-color);
-  font-size: 32pt;
-  color: white;
-}
-
 @media print {
   .button, .refresh-button {
     display: none;
   }
   header, footer {
     margin: 0;
+  }
+  .flip-card__content {
+    border: 1px solid black;
+  }
+  .flip-card:not(.flip) .flip-card__content--back {
+    display: none;
   }
 }
