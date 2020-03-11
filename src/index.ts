@@ -142,7 +142,7 @@ async function createCellElement(text: string, isFree = false) {
             <span class="text"></span>
          </div>
          <div class="flip-card__content flip-card__content--back">
-            <span class="text"></span>
+            <span class="text">${isFree ? text : ''}</span>
          </div>
      </div>`;
     await updateCellElement(flipCard, text, true);
