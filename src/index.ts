@@ -42,29 +42,69 @@ async function init() {
     }
 }
 
+async function resetActiveBoard() {
+    return new Promise<void>((resolve) => {
+        if (!boardInitialized) {
+            resolve();
+        }
+        // hide all cards to regenerate them hidden
+        const content = document.querySelectorAll('.flip-card');
+        content.forEach((e) => {
+            const isFlipped = e.classList.contains('flip');
+            const frontSelector = '.flip-card__content--front';
+            const backSelector = '.flip-card__content--back';
+            const oldContentArea = e.querySelector(isFlipped ? frontSelector : backSelector);
+            const newContentArea = e.querySelector(isFlipped ? frontSelector : backSelector);
+
+            // Hide content on other side and flip
+            if (!e.classList.contains('flip-card--free')) {
+                newContentArea.classList.add('flip-card__content--empty');
+            }
+            e.classList.toggle('flip');
+
+            setTimeout(() => {
+                // if tile is now flipped, hide the other side as well to get the initial state
+                if (e.classList.contains('flip')) {
+                    oldContentArea.classList.add('flip-card__content--empty');
+                    e.classList.toggle('flip');
+                    newContentArea.classList.remove('flip-card__content--empty');
+                }
+                boardInitialized = false;
+                resolve();
+            }, 200);
+        });
+    });
+}
+
+async function toggleCard(cellElement: Element) {
+    return new Promise<void>((resolve) => {
+        setTimeout(() => {
+            cellElement.classList.toggle('flip');
+            resolve();
+        }, 50);
+    });
+}
+
+async function toggleCards(cells: Element[]) {
+    for (const cell of cells) {
+        await toggleCard(cell);
+    }
+}
+
 async function newBoard() {
     if (settings.rows * settings.cols > data.length) {
         throw Error('Not enough cards in file.');
     }
 
+    await resetActiveBoard();
+
     const bingo = document.getElementById(BINGO_CONTAINER_ID);
-    if (!boardInitialized) {
-        bingo.innerHTML = '';
-    }
+    bingo.innerHTML = '';
 
+    const cells: Element[] = [];
     for(let i = 0; i < settings.cols; i++) {
-        if (boardInitialized) {
-            const col = bingo.querySelectorAll('.col')[i];
-            for(let j = 0; j < settings.rows; j++) {
-                const content = col.querySelectorAll('.flip-card')[j];
-                await updateCellElement(content, data[pos++], true);
-            }
-            continue;
-        }
-
         const col = document.createElement('div');
         col.className = 'col';
-        const cellElements: HTMLElement[] = [];
         for(let j = 0; j < settings.rows; j++) {
             let content: HTMLElement = null;
             if(
@@ -72,16 +112,16 @@ async function newBoard() {
                 i === Math.floor(settings.cols / 2) &&
                 j === Math.floor(settings.rows / 2)
             ) {
-                content = await createCellElement('FREE SPACE', true);
+                content = createCellElement('FREE SPACE', true);
             } else {
-                content = await createCellElement(data[pos++]);
+                content = createCellElement(data[pos++]);
             }
-            cellElements.push(content);
             col.appendChild(content);
+            cells.push(content);
         }
         bingo.appendChild(col);
-        setTimeout(() => cellElements.forEach((e) => e.classList.add('flip')), 500);
     }
+    await toggleCards(cells);
     saveBoard();
     bindEvents();
     boardInitialized = true;
@@ -111,11 +151,7 @@ function updateCellElement(flipCard: Element, text: string, addRefreshBtn = fals
         }
 
         setTimeout(() => {
-            if (isFlipped) {
-                flipCard.classList.remove('flip');
-            } else {
-                flipCard.classList.add('flip');
-            }
+            flipCard.classList.toggle('flip');
             // Remove old content
             // todo: refactor the next 5 lines into a .reset() method on FlipCard object
             const oldContentArea = flipCard.querySelector(isFlipped ? backSelector : frontSelector);
@@ -131,21 +167,24 @@ function updateCellElement(flipCard: Element, text: string, addRefreshBtn = fals
     });
 }
 
-async function createCellElement(text: string, isFree = false) {
+function createCellElement(text: string, isFree = false) {
     const flipCard = document.createElement('div');
     flipCard.classList.add('flip-card');
+    let refreshButton = `<button class="refresh-button"><i class="fa fa-refresh"></i></button>`;
     if (isFree) {
         flipCard.classList.add('flip-card--free');
+        refreshButton = '';
     }
     flipCard.innerHTML = `<div class="flip-card-inner">
          <div class="flip-card__content flip-card__content--front flip-card__content--empty">
+            ${refreshButton}
             <span class="text"></span>
          </div>
          <div class="flip-card__content flip-card__content--back">
-            <span class="text">${isFree ? text : ''}</span>
+            ${refreshButton}
+            <span class="text">${text}</span>
          </div>
      </div>`;
-    await updateCellElement(flipCard, text, true);
     return flipCard;
 }
 
