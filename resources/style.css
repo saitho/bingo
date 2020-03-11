@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css?family=Lato');
+@font-face {
+  font-family: 'Overwatch';
+  src: url(https://us.battle.net/forums/static/fonts/f014015d/f014015d.woff);
+}
+
+:root {
+  --main-bg-color: #405275;
+  --button-bg-color: #218ffe;
+  --cell-active-bg-color: #f99e1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+  touch-action: manipulation;
+}
+
+body {
+  background: var(--main-bg-color);
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+header, footer {
+  text-align: center;
+  margin: 30px 0;
+  color: white;
+}
+
+a {
+  color: inherit;
+}
+
+.button {
+  display: inline-block;
+  position: relative;
+  border-radius: 2px;
+  padding: 10px 20px;
+  border: 0;
+  font-weight: bold;
+  font-size: 0.9em;
+  text-decoration: none;
+  text-align: center;
+}
+
+.refresh-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.button.blue {
+  background-color: var(--button-bg-color);
+  color: white;
+}
+
+h1 {
+  color: white;
+  font-family: 'Overwatch', sans-serif;
+  font-size: 48pt;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 25px 0;
+}
+
+.grid {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.col {
+  flex: 0;
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+.cell {
+  position: relative;
+  align-items: center;
+  background: white;
+  border: 2px solid black;
+  color: black;
+  display: flex;
+  font-size: 11pt;
+  width: 150px;
+  height: 150px;
+  word-break: break-word;
+  justify-content: center;
+  padding: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
+.cell.checked, .cell.free {
+  background: var(--cell-active-bg-color);
+}
+
+#header .cell {
+  background-color: var(--button-bg-color);
+  font-size: 32pt;
+  color: white;
+}
+
+@media print {
+  .button, .refresh-button {
+    display: none;
+  }
+  header, footer {
+    margin: 0;
+  }
+}

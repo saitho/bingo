@@ -1,18 +1,20 @@
 {
-  "name": "my-npm-project",
-  "description": "",
+  "name": "@saithodev/bingo",
+  "description": "Play Bingo!",
   "version": "1.0.0-dev",
-  "author": "",
+  "author": "Mario Lubenka",
   "license": "MIT",
   "keywords": [
+    "bingo"
   ],
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saitho/nodejs-package-template.git"
+    "url": "https://github.com/saitho/bingo.git"
   },
   "scripts": {
-    "build": "tsc",
+    "dev:serve": "live-server dist",
+    "build": "rm -rf dist && tsc && cp resources/* dist",
     "docs:build": "typedoc --out ./docs --mode modules --tsconfig ./tsconfig.json ./src/ && touch ./docs/.nojekyll",
     "test": "jest --detectOpenHandles --coverage --verbose",
     "semantic-release": "semantic-release",
@@ -24,6 +26,7 @@
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "^3.0.2",
     "jest": "^24.9.0",
+    "live-server": "^1.2.1",
     "semantic-release": "^16.0.1",
     "ts-jest": "^24.2.0",
     "ts-mockito": "^2.5.0",

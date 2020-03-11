@@ -1,0 +1,9 @@
+{
+  "name": "Overwatch Bingo",
+  "description": "An Overwatch themed Bingo card generator.",
+  "repository": "https://github.com/AJWGeek/OverwatchBingo",
+  "keywords": ["overwatch", "bingo"],
+  "buildpacks": [
+    "heroku/nodejs"
+  ]
+}

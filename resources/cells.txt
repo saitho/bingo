@@ -1,0 +1,136 @@
+#Pre game
+    Spawn wird von allen zerstört
+    Mei-Wall, die den Spawn blockiert
+    Basketball
+    3+ different voice actions pre game
+    Die Spawn-Tür ist zugesprayt
+
+#In game
+    Schlafender Gegner wird aufgeweckt
+    Teammate verkackt Mei Wall
+    Jemand alleine überlebend auf dem Punkt
+    Ein Team 3+ Goldwaffen
+    On Fire sein
+    Komplettes Team on Fire (5+)
+    Geteabagged werden
+
+#Kills
+    Torbjörn Hammer-kill
+    Melee-Kill
+    Mercy bekommt Kill
+    Einer im Team 4-fach Kill
+    3+ Enviromental-Kills auf einmal
+    Teamkill am Gegnerteam
+    Gegnerteam kriegt Teamkill
+    Unser Sniper = Potato, Gegner Sniper = Aim God
+    Gegner Sniper fickt das Team
+
+#Tode
+    Während eigener Ultimate sterben
+    Teammate fällt unabsichtlich von der Map
+
+#Ults
+    Ult verkackt (killt/trifft niemanden)
+    B.O.B. räumt auf (3+ Kills)
+    Zarya Ult trifft nix
+    Solo geulted werden
+    Eigene Panic Ult
+    Junkrat-Ulti wartet auf Mei-Eisblock
+    Ulti Clusterfuck
+    Jemand läuft in den Nanoboost / Falsche Person
+    Ult cancel
+    Mercy Rez Death
+
+#After Game
+    Support POTG
+    3 Goldmedallien am Ende haben
+    Lootbox voller duplikate
+    Eine Karte auf dem Endscreen bekommen mit 5+ votes
+    Eine Karte auf dem Endscreen bekommen
+    Endkarte 5 Goldmedaillen
+    saitho Moira bekommt PotG
+    Yolbe bekommt PotG
+    4 likes auf einer Karte: "Komm schon, noch eine like!"
+    Lootbox mit Legendär drinne
+    Lootbox mit Geld drinne
+    Ein Team stompt ein anderes
+    C9
+
+#Comps / Verhalten
+    Stall Comp
+    Bunker Comp
+
+    Nano Blade
+    Raid boss Brigitte
+    
+    Rein + Zarya
+    Double Shield
+    Pharmercy
+    2+ Sniper im Team
+
+    Fan Mccree
+    Terrorhardt als Gegner
+    Zarya im Gegnerteam
+    Double Moira
+
+#Communication
+    Salty Teammate
+    Unidentifizierbare Geräusche von Yolbe/Ruthi
+    Über Blizzard beschweren
+    Ruthi singt random
+    Random K-Pop
+    Jemand kommt in den Chat und sagt gute Nacht
+    Egges ist triggert wegen des Chats
+    Ruthi wird zum sterbenden Meerschweinchen
+    Egges lacht schrill
+    Dummer Witz
+    Beschweren über Gegnerhelden
+    Teammate Rage
+    Einer wiederholt dauernd "Punkt Punkt Punkt!"
+    Beschwerde über Heilung
+    Jemand regt sich über einen Pick auf
+    Nach einem Punkt gibt das Team auf ("Wir gewinnen das eh nicht mehr")
+    *Dämonisches Lachen*
+    Chat: "gg ez"
+    Spam for Heal
+
+#Zitate
+    "Bitch!"
+    "Das war alles geplant"
+    "Ecken und Kanten"
+    "Fick dich (Helden Name einfügen)"
+    "Ich war hinter der Wand"
+    "...menschlich gesehen unsympatisch"
+    "Sorry", "Entschuldigung" o.Ä.
+    "Well... Shit" / "Oh shit"
+    "TF wie hat mich das getroffen!?"
+    "The Fuck?!"
+    "Well yes but actually no"
+    "Wir brauchen was gegen die Pharah"
+    "Wo bin ich gerade/ Wie komme ich hier raus"
+    "XY war ein Fehler"
+    "Wo ist der Sniper??"
+    "Woo" - "San" - "CROSS!"
+
+#Maps
+    Busan
+    Ilios
+    Lijang Tower
+    Nepal
+    Oasis
+    Hanamura
+    Horizon Lunar Colony
+    Paris
+    Temple of Anubis
+    Volksaya Industries
+    Dorado
+    Havana
+    Junkertown
+    Rialto
+    Route 66
+    Watchpoint: Gibraltar
+    Blizzard World
+    Eichenwalde
+    Hollywood
+    King's Row
+    Numbani
