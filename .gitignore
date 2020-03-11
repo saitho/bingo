@@ -3,6 +3,7 @@
 node_modules
 dist
 *.js
+!rollup.config.js
 !jest.config.js
 coverage
 docs
