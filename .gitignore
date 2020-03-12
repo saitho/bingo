@@ -1,3 +1,5 @@
+src/_versions.ts
+
 .idea
 *.iml
 node_modules
