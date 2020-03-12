@@ -1,24 +1,25 @@
 import {BingoField} from "./BingoField";
 import {CardStorage} from "./CardStorage";
+import {State, StateSaver} from "./StateSaver";
 
 const settings = {
   cols: 5,
   rows: 5,
-  dataStorageKey: 'bingoboard',
   useFreeSpace: true
 };
 
 
 export class Bingo extends HTMLElement {
   protected field: HTMLDivElement = null;
-  protected data: string[] = [];
-  protected pos = 0;
+  protected saver: StateSaver = null;
 
   boardInitialized = false;
 
   constructor() {
     // establish prototype chain
     super();
+
+    this.saver = new StateSaver();
 
     // attaches shadow tree and returns shadow root reference
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow
@@ -46,7 +47,8 @@ export class Bingo extends HTMLElement {
   // fires after the element has been attached to the DOM
   async connectedCallback() {
     await this.resetData();
-    if (!this.loadBoard()) {
+    const loadBoard = await this.loadBoard();
+    if (!loadBoard) {
       await this.newBoard();
     }
 
@@ -63,10 +65,9 @@ export class Bingo extends HTMLElement {
         resolve();
       }
       // hide all cards to regenerate them hidden
-      const content = this.shadowRoot.querySelectorAll('bingo-field');
+      const content = this.shadowRoot.querySelectorAll('bingo-field') as NodeListOf<BingoField>;
       const promises: Promise<void>[] = [];
-      for (let i = 0; i < content.length; i++) {
-        const field = content[i] as BingoField;
+      for (const field  of content) {
         promises.push(field.reset());
       }
       this.boardInitialized = false;
@@ -90,69 +91,78 @@ export class Bingo extends HTMLElement {
     }
   }
 
-  async newBoard() {
-    if (settings.rows * settings.cols > CardStorage.countAll()) {
-      throw Error('Not enough cards in file.');
-    }
-
+  async newBoardFromState(state: State) {
     await this.resetActiveBoard();
 
     this.field.innerHTML = '';
 
     const cells: Element[] = [];
-    for(let i = 0; i < settings.cols; i++) {
+    for(let i = 0; i < state.cols; i++) {
       const col = document.createElement('div');
       col.className = 'col';
-      for(let j = 0; j < settings.rows; j++) {
-        let content: HTMLElement = null;
-        if(
-            settings.useFreeSpace &&
-            i === Math.floor(settings.cols / 2) &&
-            j === Math.floor(settings.rows / 2)
-        ) {
-          content = new BingoField('FREE SPACE', { reroll: false, toggleable: true, checked: true });
-        } else {
-          content = new BingoField(CardStorage.getNextItem());
-        }
+      for(let j = 0; j < state.rows; j++) {
+        const content = BingoField.fromJSON(state.fields.shift());
         col.appendChild(content);
         cells.push(content);
       }
       this.field.appendChild(col);
     }
     await this.toggleCards(cells);
-    this.saveBoard();
+    this.saver.saveState(this.field, settings.rows, settings.cols);
     this.boardInitialized = true;
   }
 
-  /**
-   * Saves the current state of the board into local storage
-   */
-  saveBoard() {
-    localStorage.setItem(settings.dataStorageKey, this.field.innerHTML);
+  async newBoard() {
+    if (settings.rows * settings.cols > CardStorage.countAll()) {
+      throw Error('Not enough cards in file.');
+    }
+
+    const fields = [];
+    for(let i = 0; i < settings.cols; i++) {
+      for(let j = 0; j < settings.rows; j++) {
+        let content: BingoField = null;
+        if (
+            settings.useFreeSpace &&
+            i === Math.floor(settings.cols / 2) &&
+            j === Math.floor(settings.rows / 2)
+        ) {
+          content = new BingoField('FREE SPACE', { reroll: false, toggleable: false, checked: true });
+        } else {
+          content = new BingoField(CardStorage.getNextItem());
+        }
+        fields.push(content);
+      }
+    }
+
+    await this.newBoardFromState({
+      fields: fields,
+      cols: settings.cols,
+      rows: settings.rows,
+      version: 1
+    });
   }
 
   /**
    * Overrides current state of the board from local storage
    */
-  loadBoard() {
-    const content = localStorage.getItem(settings.dataStorageKey);
-    const hasContent = content && content.length > 0;
-    if (hasContent) {
-      this.field.innerHTML = content;
-      this.boardInitialized = true;
+  async loadBoard() {
+    const state = this.saver.getState();
+    if (!state) {
+      return false;
     }
-    return hasContent;
+    await this.newBoardFromState(state);
+    return true;
   }
 
   bindEvents() {
     this.addEventListener("bingoFieldChecked", function (e) {
-      this.saveBoard();
+      this.saver.saveState(this.field, settings.rows, settings.cols);
     });
     this.addEventListener("bingoFieldSwapped", function (e) {
       if (CardStorage.isEmpty()) { // No more cards in array -> remove swap buttons.
         this.field.querySelectorAll('.refresh-button').forEach((e) => e.remove());
       }
-      this.saveBoard();
+      this.saver.saveState(this.field, settings.rows, settings.cols);
     });
   }
 
