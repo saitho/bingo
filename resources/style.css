@@ -45,7 +45,7 @@ h1 {
   font-size: 48pt;
   text-align: center;
   text-transform: uppercase;
-  margin: 25px 0;
+  margin: 0;
 }
 
 @media print {
