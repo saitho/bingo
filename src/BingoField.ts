@@ -2,15 +2,17 @@ import {CardStorage} from "./CardStorage";
 
 export class BingoField extends HTMLElement {
 
+    // TODO: why is this needed?! without constructor seems to be called twice and fieldText is empty
     protected text = '';
 
     checkEvent: CustomEvent = null;
     swapEvent: CustomEvent = null;
 
-    constructor(text: string = '', attributes: BingoFieldAttributes = {reroll: true, toggleable: true, checked: false}) {
+    constructor(fieldText: string = '', attributes: BingoFieldAttributes = {reroll: true, toggleable: true, checked: false}) {
         super();
 
-        this.text = text;
+        // TODO: why is this needed?! without constructor seems to be called twice and fieldText is empty
+        this.text = fieldText;
 
         for (let key in attributes) {
             if (!attributes.hasOwnProperty(key)) {
@@ -24,27 +26,16 @@ export class BingoField extends HTMLElement {
         }
 
         const inner = document.createElement('div');
-        inner.classList.add('flip-card-inner');
-
-        // Extract text from innerHTML if present (when restoring from LocalStorage)
-        const hasContent = this.innerText.trim().length > 0;
-        if (hasContent) {
-            this.text = this.innerText.trim();
-            this.classList.add('flip');
-        }
-
-        inner.classList.add('flip-card-inner--empty-front');
+        inner.classList.add('flip-card-inner', 'flip-card-inner--empty-front');
         inner.innerHTML = `<div class="flip-card__content flip-card__content--front">
-            ${this.getRefreshButton()}
             <span class="text"></span>
          </div>
          <div class="flip-card__content flip-card__content--back">
-            ${this.getRefreshButton()}
-            <span class="text">${this.text}</span>
+            <span class="text"></span>
          </div>`;
 
-        this.innerHTML = '';
         this.appendChild(inner);
+        this.setCardText(fieldText, true);
 
         this.checkEvent = new CustomEvent("bingoFieldChecked", {
             bubbles: true,
@@ -61,7 +52,6 @@ export class BingoField extends HTMLElement {
 
     // fires after the element has been attached to the DOM
     connectedCallback() {
-
         if (this.hasAttribute('toggleable')) {
             this.addEventListener(
                 'click',
@@ -77,21 +67,27 @@ export class BingoField extends HTMLElement {
                 }
             );
         }
-
-        const refreshButtons = this.querySelectorAll('button.refresh-button');
-        if (refreshButtons.length) {
-            const that = this;
-            refreshButtons.forEach((e) => e.addEventListener('click', async () => {
-                await that.swapCard(CardStorage.getNextItem())
-            }));
-        }
     }
 
+    /**
+     * Returns text from card side that is currently shown
+     */
+    getActiveText(): string {
+        const side = this.classList.contains('flip') ? 'back' : 'front';
+        return this.querySelector('.flip-card__content--' + side + ' .text').textContent;
+    }
+
+    /**
+     * Sets check state for card
+     */
     checkCard() {
         this.toggleAttribute('checked');
         this.dispatchEvent(this.checkEvent);
     }
 
+    /**
+     * Returns HTML code for refresh button if it is enabled
+     */
     private getRefreshButton() {
         if (!this.hasAttribute('reroll')) {
             return '';
@@ -101,11 +97,10 @@ export class BingoField extends HTMLElement {
 
     /**
      * Sets a text on a given card side
-     * @param text
+     * @param fieldText
      * @param hiddenSide
-     * @param restoreRefreshButton
      */
-    protected setCardText(text: string, hiddenSide = false, restoreRefreshButton = false) {
+    protected setCardText(fieldText: string, hiddenSide = false) {
         const sides = ['front', 'back'];
         if (hiddenSide) {
             sides.reverse();
@@ -117,18 +112,26 @@ export class BingoField extends HTMLElement {
 
         const contentEmpty = 'flip-card-inner--empty-' + side;
         contentArea.closest('.flip-card-inner').classList.remove(contentEmpty);
-        contentArea.querySelector('.text').innerHTML = text;
+        contentArea.querySelector('.text').innerHTML = fieldText;
 
-        this.removeAttribute('checked');
-
-        if (restoreRefreshButton) {
-            if (!contentArea.querySelector('button.refresh-button')) {
-                contentArea.innerHTML = this.getRefreshButton() + contentArea.innerHTML;
+        if (!contentArea.querySelector('button.refresh-button')) {
+            contentArea.innerHTML = this.getRefreshButton() + contentArea.innerHTML;
+            const refreshButtons = contentArea.querySelector('button.refresh-button');
+            if (refreshButtons) {
+                const that = this;
+                refreshButtons.addEventListener('click', async () => {
+                    await that.swapCard(CardStorage.getNextItem())
+                });
             }
         }
     }
 
-    public swapCard(text: string, addRefreshBtn =false) {
+    /**
+     * Set text on non-visible side and flips card to other side
+     * Also clears checked state
+     * @param cardText
+     */
+    public swapCard(cardText: string) {
         return new Promise<void>((resolve) => {
             if (!this.hasAttribute('toggleable')) {
                 resolve();
@@ -136,15 +139,15 @@ export class BingoField extends HTMLElement {
             }
 
             // Set content on hidden slide
-            this.setCardText(text, true, addRefreshBtn);
+            this.setCardText(cardText, true);
+            this.removeAttribute('checked');
 
             // Toggle
             this.classList.toggle('flip');
-            this.removeAttribute('checked');
 
             setTimeout(() => {
                 // Clear contents from now hidden side
-                this.setCardText('', true,  addRefreshBtn);
+                this.setCardText('', true);
                 this.dispatchEvent(this.swapEvent);
                 resolve();
             }, 100);
@@ -154,23 +157,21 @@ export class BingoField extends HTMLElement {
     public reset() {
         return new Promise<void>((resolve) => {
             const isFlipped = this.classList.contains('flip');
-            const frontSelector = '.flip-card__content--front';
-            const backSelector = '.flip-card__content--back';
-            const oldContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
-            const newContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
+            const sides = ['front', 'back'];
+            const side = isFlipped ? sides[0] : sides[1];
+            const otherSide = isFlipped ? sides[1] : sides[0];
 
             // Hide content on other side and flip
-            const emptyClass = isFlipped ? 'flip-card-inner--empty-front' : 'flip-card-inner--empty-back';
-            newContentArea.closest('.flip-card-inner').classList.add(emptyClass);
+            const emptyClass = 'flip-card-inner--empty-' + side;
+            this.querySelector('.flip-card-inner').classList.add(emptyClass);
             this.classList.toggle('flip');
 
             setTimeout(() => {
                 // if tile is now flipped, hide the other side as well to get the initial state
                 if (this.classList.contains('flip')) {
-                    const emptyClassOld = isFlipped ? 'flip-card-inner--empty-back' : 'flip-card-inner--empty-front';
-                    oldContentArea.closest('.flip-card-inner').classList.add(emptyClassOld);
+                    this.querySelector('.flip-card-inner').classList.add('flip-card-inner--empty-' + otherSide);
                     this.classList.toggle('flip');
-                    newContentArea.closest('.flip-card-inner').classList.remove(emptyClass);
+                    this.querySelector('.flip-card-inner').classList.remove(emptyClass);
                 }
                 resolve();
             }, 300);
@@ -179,7 +180,7 @@ export class BingoField extends HTMLElement {
 
     toJSON(): BingoFieldJSON {
         return {
-            text: this.text,
+            text: this.getActiveText(),
             attributes: {
                 reroll: this.hasAttribute('reroll'),
                 toggleable: this.hasAttribute('toggleable'),
