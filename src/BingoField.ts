@@ -2,22 +2,36 @@ import {CardStorage} from "./CardStorage";
 
 export class BingoField extends HTMLElement {
 
+    protected text = '';
+
     checkEvent: CustomEvent = null;
     swapEvent: CustomEvent = null;
 
-    constructor(attributes: {text?: string, reroll?: boolean, toggleable?: boolean, checked?: boolean}) {
+    constructor(text: string = '', attributes: {reroll?: boolean, toggleable?: boolean, checked?: boolean} = {}) {
         super();
+
+        // Extract text from innerHTML if present (when restoring from LocalStorage)
+        if (this.innerHTML.length > 0) {
+            const temp = document.createElement('div');
+            temp.innerHTML = this.innerHTML;
+            const selector = this.classList.contains('flip') ? 'back' : 'front';
+            const elementText = temp.querySelector('.flip-card__content--' + selector + ' span.text');
+            text = elementText.textContent;
+        }
 
         this.checkEvent = new CustomEvent("bingoFieldChecked", {
             bubbles: true,
             cancelable: false,
+            composed: true
         });
-
 
         this.swapEvent = new CustomEvent("bingoFieldSwapped", {
             bubbles: true,
             cancelable: false,
+            composed: true
         });
+
+        this.text = text;
 
         for (let key in attributes) {
             let value = attributes[key];
@@ -41,7 +55,7 @@ export class BingoField extends HTMLElement {
          </div>
          <div class="flip-card__content flip-card__content--back">
             ${this.getRefreshButton()}
-            <span class="text">${this.getAttribute('text')}</span>
+            <span class="text">${this.text}</span>
          </div>
      </div>`;
 
@@ -134,28 +148,33 @@ export class BingoField extends HTMLElement {
         });
     }
 
-    public async reset() {
-        const isFlipped = this.classList.contains('flip');
-        const frontSelector = '.flip-card__content--front';
-        const backSelector = '.flip-card__content--back';
-        const oldContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
-        const newContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
+    public reset() {
+        return new Promise<void>((resolve) => {
+            const isFlipped = this.classList.contains('flip');
+            const frontSelector = '.flip-card__content--front';
+            const backSelector = '.flip-card__content--back';
+            const oldContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
+            const newContentArea = this.querySelector(isFlipped ? frontSelector : backSelector);
 
-        // Hide content on other side and flip
-        const emptyClass = isFlipped ? 'flip-card-inner--empty-front' : 'flip-card-inner--empty-back';
-        if (!this.classList.contains('flip-card--free')) {
-            newContentArea.closest('.flip-card-inner').classList.add(emptyClass);
-        }
-        this.classList.toggle('flip');
-
-        setTimeout(() => {
-            // if tile is now flipped, hide the other side as well to get the initial state
-            if (this.classList.contains('flip')) {
-                const emptyClassOld = isFlipped ? 'flip-card-inner--empty-back' : 'flip-card-inner--empty-front';
-                oldContentArea.closest('.flip-card-inner').classList.add(emptyClassOld);
-                this.classList.toggle('flip');
-                newContentArea.closest('.flip-card-inner').classList.remove(emptyClass);
+            // Hide content on other side and flip
+            const emptyClass = isFlipped ? 'flip-card-inner--empty-front' : 'flip-card-inner--empty-back';
+            if (!this.hasAttribute('toggleable') || !this.getAttribute('toggleable')) {
+                newContentArea.closest('.flip-card-inner').classList.add(emptyClass);
             }
-        }, 200);
+            this.classList.toggle('flip');
+
+            //throw Error('test');
+
+            setTimeout(() => {
+                // if tile is now flipped, hide the other side as well to get the initial state
+                if (this.classList.contains('flip')) {
+                    const emptyClassOld = isFlipped ? 'flip-card-inner--empty-back' : 'flip-card-inner--empty-front';
+                    oldContentArea.closest('.flip-card-inner').classList.add(emptyClassOld);
+                    this.classList.toggle('flip');
+                    newContentArea.closest('.flip-card-inner').classList.remove(emptyClass);
+                }
+                resolve();
+            }, 300);
+        });
     }
 }

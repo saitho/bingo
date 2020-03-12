@@ -64,11 +64,13 @@ export class Bingo extends HTMLElement {
       }
       // hide all cards to regenerate them hidden
       const content = this.shadowRoot.querySelectorAll('bingo-field');
-      for (const e of content) {
-        const field = e as BingoField;
-        await field.reset();
+      const promises: Promise<void>[] = [];
+      for (let i = 0; i < content.length; i++) {
+        const field = content[i] as BingoField;
+        promises.push(field.reset());
       }
       this.boardInitialized = false;
+      await Promise.all(promises);
       resolve();
     });
   }
@@ -108,9 +110,9 @@ export class Bingo extends HTMLElement {
             i === Math.floor(settings.cols / 2) &&
             j === Math.floor(settings.rows / 2)
         ) {
-          content = new BingoField({ text: 'FREE SPACE', reroll: false, toggleable: true, checked: true });
+          content = new BingoField('FREE SPACE', { reroll: false, toggleable: true, checked: true });
         } else {
-          content = new BingoField({text: CardStorage.getNextItem()});
+          content = new BingoField(CardStorage.getNextItem());
         }
         col.appendChild(content);
         cells.push(content);
@@ -126,9 +128,7 @@ export class Bingo extends HTMLElement {
    * Saves the current state of the board into local storage
    */
   saveBoard() {
-    let content = this.field.innerHTML;
-    content = content.replace(/style=".*?"/g, ''); // remove inline stylings (remaining fade steps)
-    localStorage.setItem(settings.dataStorageKey, content);
+    localStorage.setItem(settings.dataStorageKey, this.field.innerHTML);
   }
 
   /**
