@@ -42,6 +42,7 @@ jobs:
           node-version: 12
       - name: PNPM install
         run: npm i -g pnpm && pnpm i -P
+      - run: pnpm install
       - name: Semantic Release Action
         uses: codfish/semantic-release-action@master
         env:
