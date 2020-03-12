@@ -22,6 +22,10 @@ export class StateSaver {
         }));
     }
 
+    public clearStates() {
+        localStorage.removeItem(this.dataStorageKey);
+    }
+
     public getState(): State {
         const content = localStorage.getItem(this.dataStorageKey);
         try {
@@ -36,38 +40,6 @@ export class StateSaver {
             return storageObject;
         } catch (e) {
             return null;
-        }
-    }
-
-    /**
-     * @deprecated
-     * @param container
-     */
-    public loadState(container: HTMLElement): boolean {
-        const content = localStorage.getItem(this.dataStorageKey);
-        try {
-            const storageObject: State = JSON.parse(content);
-            if (!storageObject) {
-                return false;
-            }
-            if (storageObject.version !== this.currentVersion) {
-                // todo: migration if we have later versions...
-            }
-
-            container.innerHTML = '';
-            for (let i = 0; i < storageObject.rows; i++) {
-                for (let j = 0; j < storageObject.cols; j++) {
-
-                }
-            }
-
-            for (const field of storageObject.fields) {
-                container.appendChild(BingoField.fromJSON(field));
-            }
-
-            return true;
-        } catch (e) {
-            return false;
         }
     }
 }
