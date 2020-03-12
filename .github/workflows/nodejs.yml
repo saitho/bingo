@@ -45,7 +45,7 @@ jobs:
       - run: pnpm install
       - run: mkdir -p docs
       - name: Semantic Release Action
-        uses: cherryblossom000/semantic-release-action-pnpm@v1
+        uses: cherryblossom000/semantic-release-action-pnpm@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
