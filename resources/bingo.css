@@ -55,7 +55,6 @@ bingo-field {
   -webkit-user-select: none;
 }
 
-/* This container is needed to position the front and back side */
 .flip-card-inner {
   position: relative;
   width: 100%;
@@ -100,7 +99,6 @@ bingo-field:not(.flip) .flip-card-inner--empty-front, bingo-field.flip .flip-car
   display: none;
 }
 
-/* Style the back side */
 .flip-card__content--back {
   transform: rotateY(180deg);
 }

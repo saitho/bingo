@@ -7,17 +7,44 @@ export class BingoField extends HTMLElement {
     checkEvent: CustomEvent = null;
     swapEvent: CustomEvent = null;
 
-    constructor(text: string = '', attributes: {reroll?: boolean, toggleable?: boolean, checked?: boolean} = {}) {
+    constructor(text: string = '', attributes: BingoFieldAttributes = {reroll: true, toggleable: true, checked: false}) {
         super();
 
-        // Extract text from innerHTML if present (when restoring from LocalStorage)
-        if (this.innerHTML.length > 0) {
-            const temp = document.createElement('div');
-            temp.innerHTML = this.innerHTML;
-            const selector = this.classList.contains('flip') ? 'back' : 'front';
-            const elementText = temp.querySelector('.flip-card__content--' + selector + ' span.text');
-            text = elementText.textContent;
+        this.text = text;
+
+        for (let key in attributes) {
+            if (!attributes.hasOwnProperty(key)) {
+                continue;
+            }
+            if (attributes[key]) {
+                this.setAttribute(key, '');
+            } else {
+                this.removeAttribute(key);
+            }
         }
+
+        const inner = document.createElement('div');
+        inner.classList.add('flip-card-inner');
+
+        // Extract text from innerHTML if present (when restoring from LocalStorage)
+        const hasContent = this.innerText.trim().length > 0;
+        if (hasContent) {
+            this.text = this.innerText.trim();
+            this.classList.add('flip');
+        }
+
+        inner.classList.add('flip-card-inner--empty-front');
+        inner.innerHTML = `<div class="flip-card__content flip-card__content--front">
+            ${this.getRefreshButton()}
+            <span class="text"></span>
+         </div>
+         <div class="flip-card__content flip-card__content--back">
+            ${this.getRefreshButton()}
+            <span class="text">${this.text}</span>
+         </div>`;
+
+        this.innerHTML = '';
+        this.appendChild(inner);
 
         this.checkEvent = new CustomEvent("bingoFieldChecked", {
             bubbles: true,
@@ -30,36 +57,12 @@ export class BingoField extends HTMLElement {
             cancelable: false,
             composed: true
         });
-
-        this.text = text;
-
-        for (let key in attributes) {
-            let value = attributes[key];
-            if (value instanceof Boolean) {
-                if (value) {
-                    this.setAttribute(key, '');
-                } else {
-                    this.removeAttribute(key);
-                }
-            }
-            this.setAttribute(key, value.toString());
-        }
     }
 
     // fires after the element has been attached to the DOM
     connectedCallback() {
-        this.innerHTML = `<div class="flip-card-inner flip-card-inner--empty-front">
-         <div class="flip-card__content flip-card__content--front">
-            ${this.getRefreshButton()}
-            <span class="text"></span>
-         </div>
-         <div class="flip-card__content flip-card__content--back">
-            ${this.getRefreshButton()}
-            <span class="text">${this.text}</span>
-         </div>
-     </div>`;
 
-        if (!this.hasAttribute('toggleable') || !this.getAttribute('toggleable')) {
+        if (this.hasAttribute('toggleable')) {
             this.addEventListener(
                 'click',
                 (e) => {
@@ -75,13 +78,12 @@ export class BingoField extends HTMLElement {
             );
         }
 
-        const refreshButton = this.querySelector('button.refresh-button');
-        if (refreshButton) {
+        const refreshButtons = this.querySelectorAll('button.refresh-button');
+        if (refreshButtons.length) {
             const that = this;
-            refreshButton.addEventListener('click', async () => {
-                console.log('swapCard');
+            refreshButtons.forEach((e) => e.addEventListener('click', async () => {
                 await that.swapCard(CardStorage.getNextItem())
-            });
+            }));
         }
     }
 
@@ -91,7 +93,7 @@ export class BingoField extends HTMLElement {
     }
 
     private getRefreshButton() {
-        if (this.hasAttribute('reroll') && this.getAttribute('reroll')) {
+        if (!this.hasAttribute('reroll')) {
             return '';
         }
         return `<button class="refresh-button"><i class="fas fa-redo"></i></button>`;
@@ -114,22 +116,21 @@ export class BingoField extends HTMLElement {
         let contentArea = this.querySelector(selector);
 
         const contentEmpty = 'flip-card-inner--empty-' + side;
-        contentArea.classList.remove('checked');
         contentArea.closest('.flip-card-inner').classList.remove(contentEmpty);
         contentArea.querySelector('.text').innerHTML = text;
 
+        this.removeAttribute('checked');
+
         if (restoreRefreshButton) {
-            if (restoreRefreshButton) {
-                if (!contentArea.querySelector('button.refresh-button')) {
-                    contentArea.innerHTML = this.getRefreshButton() + contentArea.innerHTML;
-                }
+            if (!contentArea.querySelector('button.refresh-button')) {
+                contentArea.innerHTML = this.getRefreshButton() + contentArea.innerHTML;
             }
         }
     }
 
     public swapCard(text: string, addRefreshBtn =false) {
         return new Promise<void>((resolve) => {
-            if (this.hasAttribute('toggleable') && this.getAttribute('toggleable')) {
+            if (!this.hasAttribute('toggleable')) {
                 resolve();
                 return;
             }
@@ -139,10 +140,12 @@ export class BingoField extends HTMLElement {
 
             // Toggle
             this.classList.toggle('flip');
+            this.removeAttribute('checked');
 
             setTimeout(() => {
                 // Clear contents from now hidden side
                 this.setCardText('', true,  addRefreshBtn);
+                this.dispatchEvent(this.swapEvent);
                 resolve();
             }, 100);
         });
@@ -158,12 +161,8 @@ export class BingoField extends HTMLElement {
 
             // Hide content on other side and flip
             const emptyClass = isFlipped ? 'flip-card-inner--empty-front' : 'flip-card-inner--empty-back';
-            if (!this.hasAttribute('toggleable') || !this.getAttribute('toggleable')) {
-                newContentArea.closest('.flip-card-inner').classList.add(emptyClass);
-            }
+            newContentArea.closest('.flip-card-inner').classList.add(emptyClass);
             this.classList.toggle('flip');
-
-            //throw Error('test');
 
             setTimeout(() => {
                 // if tile is now flipped, hide the other side as well to get the initial state
@@ -177,4 +176,34 @@ export class BingoField extends HTMLElement {
             }, 300);
         });
     }
+
+    toJSON(): BingoFieldJSON {
+        return {
+            text: this.text,
+            attributes: {
+                reroll: this.hasAttribute('reroll'),
+                toggleable: this.hasAttribute('toggleable'),
+                checked: this.hasAttribute('checked')
+            }
+        };
+    }
+
+    static fromJSON(jsonObject: BingoFieldJSON): BingoField {
+        return new this(jsonObject.text, {
+            checked: jsonObject.attributes.checked,
+            toggleable: jsonObject.attributes.toggleable,
+            reroll: jsonObject.attributes.reroll,
+        });
+    }
+}
+
+export interface BingoFieldAttributes {
+    reroll?: boolean,
+    toggleable?: boolean,
+    checked?: boolean
+}
+
+export interface BingoFieldJSON {
+    text: string,
+    attributes: BingoFieldAttributes
 }
