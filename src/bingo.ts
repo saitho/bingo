@@ -167,7 +167,7 @@ export class Bingo extends HTMLElement {
   }
 
   async resetData() {
-    const s = await fetch('cells.txt');
+    const s = await fetch('data/cells.txt');
     const t = await s.text();
     let lines = t.split('\n');
     lines = lines.map(function(a) { return a.trim() });
