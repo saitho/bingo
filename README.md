@@ -5,6 +5,10 @@
 
 Play bingo!
 
+This repository is based on [the bingo by ajwgeek](https://github.com/ajwgeek/OverwatchBingo).
+While it is currently still focused on Overwatch and its cards are pretty much personal phrases and insiders,
+the long-term goal is to create an application which can be used for multiple themes and audiences.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## Features
