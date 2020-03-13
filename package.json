@@ -12,9 +12,9 @@
     "url": "https://github.com/saitho/bingo.git"
   },
   "scripts": {
-    "start": "http-server dist",
+    "start": "node dist/app.js",
     "dev:serve": "live-server dist",
-    "build": "rm -rf dist && mkdir -p dist/css && mkdir -p dist/webfonts && ts-appversion --pnpm && rollup -c && cp -r resources/* dist && cp node_modules/@fortawesome/fontawesome-free/css/all.min.css dist/css/fontawesome.css && cp -r node_modules/@fortawesome/fontawesome-free/webfonts dist",
+    "build": "rm -rf dist && mkdir -p dist/public/css && mkdir -p dist/public/webfonts && ts-appversion --pnpm && rollup -c && cp -r resources/* dist/public/ && cp node_modules/@fortawesome/fontawesome-free/css/all.min.css dist/public/css/fontawesome.css && cp -r node_modules/@fortawesome/fontawesome-free/webfonts dist/public",
     "docs:build": "ts-appversion --pnpm && typedoc --out ./docs --mode modules --tsconfig ./tsconfig.json ./src/ && touch ./docs/.nojekyll",
     "test": "jest --detectOpenHandles --coverage --verbose",
     "semantic-release": "semantic-release",
@@ -25,12 +25,16 @@
     "@rollup/plugin-typescript": "^4.0.0",
     "@saithodev/semantic-release-sharedconf-npm": "^2.0.2",
     "@saithodev/ts-appversion": "^2.0.0",
+    "@types/express": "^4.17.3",
     "@types/jest": "^24.0.23",
+    "@types/node": "^13.9.1",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "^3.0.2",
     "jest": "^24.9.0",
     "live-server": "^1.2.1",
     "rollup": "^2.0.3",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.26.0",
     "semantic-release": "^16.0.1",
@@ -46,6 +50,6 @@
     }
   },
   "dependencies": {
-    "http-server": "^0.12.1"
+    "express": "^4.17.1"
   }
 }
