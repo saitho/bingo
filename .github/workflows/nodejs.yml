@@ -45,7 +45,7 @@ jobs:
       - run: pnpm install
       - run: mkdir -p docs
       - name: Semantic Release Action
-        uses: cherryblossom000/semantic-release-action-pnpm@master
+        uses: saitho/semantic-release-action-pnpm@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
