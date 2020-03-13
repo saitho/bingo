@@ -1,7 +1,7 @@
 {
   "name": "@saithodev/bingo",
   "description": "Play Bingo!",
-  "version": "1.0.0-dev",
+  "version": "1.0.0",
   "author": "Mario Lubenka",
   "license": "MIT",
   "keywords": [
