@@ -15,7 +15,7 @@
     "start": "http-server dist",
     "dev:serve": "live-server dist",
     "build": "rm -rf dist && mkdir -p dist/css && mkdir -p dist/webfonts && ts-appversion --pnpm && rollup -c && cp -r resources/* dist && cp node_modules/@fortawesome/fontawesome-free/css/all.min.css dist/css/fontawesome.css && cp -r node_modules/@fortawesome/fontawesome-free/webfonts dist",
-    "docs:build": "typedoc --out ./docs --mode modules --tsconfig ./tsconfig.json ./src/ && touch ./docs/.nojekyll",
+    "docs:build": "ts-appversion --pnpm && typedoc --out ./docs --mode modules --tsconfig ./tsconfig.json ./src/ && touch ./docs/.nojekyll",
     "test": "jest --detectOpenHandles --coverage --verbose",
     "semantic-release": "semantic-release",
     "commit": "git-cz"
