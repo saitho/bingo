@@ -3,8 +3,8 @@ import {CardStorage} from "./CardStorage";
 import {State, StateSaver} from "./StateSaver";
 
 const settings = {
-  cols: 5,
-  rows: 5,
+  cols: 3,
+  rows: 3,
   useFreeSpace: true
 };
 
