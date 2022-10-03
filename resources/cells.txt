@@ -1,25 +1,35 @@
 #In game
-    Being on fire
-    Whole team on fire
+    Unlock achievement
+
+#Kills
+    Torbjörn Hammer kill
+    Melee-Kill
+    Mercy gets a kill
+    someone gets quadruple kill
+    environmental kill with 3+ people
+    our team gets a team kill
+    enemy team gets a team kill
+    our sniper = Potato, enemy sniper = Aim God
+    Gegner Sniper f*cks the team
+
+#Tode
+    Die during own ultimate
+    Team mate falls off the map
+
+#Ults
+    Getting solo ulted
+    Ulti Clusterfuck
+    Ult cancel
 
 #After Game
-    3 gold medals at the end of game
-    lootbox with duplicates
-    getting a card with 5+ votes
-    getting a card
-    5 gold medals at the end of game
-    loot box with legendary
-    loot box with credits
-
-#Comps / Verhalten
-    Pirate Ship
-    Goats
-    Rein + Zarya
-    Double Shield
+    Support POTG
+    A team stomps the other team
+    C9
 
 #Maps
-    Hanamura
-    Horizon Lunar Colony
-    Paris
-    Temple of Anubis
-    Volksaya Industries
+    New Queen Street
+    Colosseo
+    Circuit Royal
+    Midtown
+    Esperança
+    Paraíso
