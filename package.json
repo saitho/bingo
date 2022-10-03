@@ -24,7 +24,7 @@
     "@fortawesome/fontawesome-free": "^5.12.1",
     "@rollup/plugin-typescript": "^4.0.0",
     "@saithodev/semantic-release-sharedconf-npm": "^2.0.2",
-    "@saithodev/ts-appversion": "^2.0.0",
+    "@saithodev/ts-appversion": "^2.2.0",
     "@types/jest": "^24.0.23",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "^3.0.2",
