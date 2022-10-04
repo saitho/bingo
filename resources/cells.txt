@@ -1,5 +1,7 @@
 #In game
-    Unlock achievement
+    Unlock Soujourne achievement
+    Unlock Junker Queen achievement
+    Unlock Kiriko achievement
 
 #Kills
     Torbjörn Hammer kill
